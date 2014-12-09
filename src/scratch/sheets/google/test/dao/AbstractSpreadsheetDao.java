@@ -3,8 +3,9 @@ package scratch.sheets.google.test.dao;
 import java.net.URI;
 import java.net.URL;
 import java.net.URLEncoder;
-import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import scratch.sheets.google.test.OAuthUtil;
 import scratch.sheets.google.test.model.AbstractResource;
@@ -22,7 +23,7 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 	private static final String SPREADSHEET_FEED_URL = "https://spreadsheets.google.com/feeds/spreadsheets/private/full";
 	private static final String SPREADSHEET_TITLE = "TestData";
 	
-	private SpreadsheetService spreadsheetService;
+	protected SpreadsheetService spreadsheetService;
 	
 	protected AbstractSpreadsheetDao() throws SpreadsheetDaoException {
 		try {
@@ -35,10 +36,10 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 
 	@Override
 	public T get(long id) throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet(getWorksheetName());
+		ListEntry row = getRowById(worksheet, id);
+		
 		try {
-			WorksheetEntry worksheet = getWorksheet(getWorksheetName());
-			ListEntry row = getRowById(worksheet, id);
-			
 			T resource = null;
 			if (row != null) {
 				resource = parseResourceFromRow(row);
@@ -52,11 +53,12 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 	}
 
 	@Override
-	public List<T> getAll() throws AthleticsDaoException {
+	public Set<T> getAll() throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet(getWorksheetName());
+
 		try {
-			WorksheetEntry worksheet = getWorksheet(getWorksheetName());
 			List<ListEntry> rows = spreadsheetService.getFeed(worksheet.getListFeedUrl(), ListFeed.class).getEntries();
-			List<T> resources = new ArrayList<>();
+			Set<T> resources = new HashSet<>();
 			for (ListEntry row : rows) {
 				resources.add(parseResourceFromRow(row));
 			}
@@ -70,8 +72,9 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 
 	@Override
 	public long add(T resource) throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet(getWorksheetName());
+		
 		try {
-			WorksheetEntry worksheet = getWorksheet(getWorksheetName());
 			URL listFeedUrl = new URI(worksheet.getListFeedUrl().toString() + "?reverse=true&orderby=column:id").toURL();
 			List<ListEntry> rows = spreadsheetService.getFeed(listFeedUrl, ListFeed.class).getEntries();
 			
@@ -93,10 +96,10 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 
 	@Override
 	public void update(long id, T resource) throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet(getWorksheetName());
+		ListEntry row = getRowById(worksheet, id);
+		
 		try {
-			WorksheetEntry worksheet = getWorksheet(getWorksheetName());
-			ListEntry row = getRowById(worksheet, id);
-			
 			if (row != null) {
 				row = updateRowWithResource(row, resource);
 				row.update();
@@ -112,10 +115,10 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 
 	@Override
 	public void remove(long id) throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet(getWorksheetName());
+		ListEntry row = getRowById(worksheet, id);
+		
 		try {
-			WorksheetEntry worksheet = getWorksheet(getWorksheetName());
-			ListEntry row = getRowById(worksheet, id);
-			
 			// Delete the row with the given id if it exists
 			if (row != null) {
 				row.delete();
@@ -150,12 +153,11 @@ public abstract class AbstractSpreadsheetDao<T extends AbstractResource> impleme
 					return worksheet;
 				}
 			}
-			
-			return null;
-			
 		} catch (Throwable t) {
 			throw new SpreadsheetDaoException(t);
 		}
+		
+		throw new SpreadsheetDaoException("Worksheet with name [" + name + "] does not exist");
 	}
 	
 	protected ListEntry getRowById(WorksheetEntry worksheet, long id) throws AthleticsDaoException {

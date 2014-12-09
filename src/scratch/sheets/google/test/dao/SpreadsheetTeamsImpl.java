@@ -45,5 +45,4 @@ public class SpreadsheetTeamsImpl extends AbstractSpreadsheetDao<Team> {
 	protected String getWorksheetName() {
 		return "Teams";
 	}
-	
 }
