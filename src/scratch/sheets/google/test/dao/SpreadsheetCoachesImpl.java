@@ -4,7 +4,7 @@ import com.google.gdata.data.spreadsheet.ListEntry;
 
 import scratch.sheets.google.test.model.Coach;
 
-public class SpreadsheetCoachesImpl extends AbstractSpreadsheetDao<Coach> {
+public class SpreadsheetCoachesImpl extends AbstractSpreadsheetDao<Coach> implements CoachesDao {
 
 	protected SpreadsheetCoachesImpl() throws SpreadsheetDaoException {
 		super();

@@ -4,7 +4,7 @@ import com.google.gdata.data.spreadsheet.ListEntry;
 
 import scratch.sheets.google.test.model.Sport;
 
-public class SpreadsheetSportsImpl extends AbstractSpreadsheetDao<Sport> {
+public class SpreadsheetSportsImpl extends AbstractSpreadsheetDao<Sport> implements SportsDao {
 
 	protected SpreadsheetSportsImpl() throws SpreadsheetDaoException {
 		super();

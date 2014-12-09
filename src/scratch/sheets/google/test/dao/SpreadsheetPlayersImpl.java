@@ -4,7 +4,7 @@ import com.google.gdata.data.spreadsheet.ListEntry;
 
 import scratch.sheets.google.test.model.Player;
 
-public class SpreadsheetPlayersImpl extends AbstractSpreadsheetDao<Player> {
+public class SpreadsheetPlayersImpl extends AbstractSpreadsheetDao<Player> implements PlayersDao {
 
 	protected SpreadsheetPlayersImpl() throws SpreadsheetDaoException {
 		super();

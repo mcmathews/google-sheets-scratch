@@ -1,13 +1,72 @@
 package scratch.sheets.google.test.dao;
 
-import com.google.gdata.data.spreadsheet.ListEntry;
+import java.net.URI;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
+import scratch.sheets.google.test.model.Coach;
+import scratch.sheets.google.test.model.Player;
+import scratch.sheets.google.test.model.Sport;
 import scratch.sheets.google.test.model.Team;
 
-public class SpreadsheetTeamsImpl extends AbstractSpreadsheetDao<Team> {
+import com.google.gdata.data.spreadsheet.ListEntry;
+import com.google.gdata.data.spreadsheet.ListFeed;
+import com.google.gdata.data.spreadsheet.WorksheetEntry;
+
+public class SpreadsheetTeamsImpl extends AbstractSpreadsheetDao<Team> implements TeamsDao {
 
 	protected SpreadsheetTeamsImpl() throws SpreadsheetDaoException {
 		super();
+	}
+	
+	@Override
+	public Coach getCoach(long id) throws AthleticsDaoException {
+		Team team = get(id);
+		if (team != null) {
+			CoachesDao dao = SpreadsheetDaoFactory.getCoachesDaoInstance();
+			return dao.get(id);
+		} else {
+			throw new AthleticsDaoException("Team with id [" + id + "] does not exist");
+		}
+	}
+
+	@Override
+	public Sport getSport(long id) throws AthleticsDaoException {
+		Team team = get(id);
+		if (team != null) {
+			SportsDao dao = SpreadsheetDaoFactory.getSportsDaoInstance();
+			return dao.get(id);
+		} else {
+			throw new AthleticsDaoException("Team with id [" + id + "] does not exist");
+		}
+	}
+
+	@Override
+	public Set<Player> getPlayers(long id) throws AthleticsDaoException {
+		WorksheetEntry worksheet = getWorksheet("PlayersToTeams");
+		
+		try {
+			String query = URLEncoder.encode("team = " + id, "UTF-8");
+			URL listFeedUrl = new URI(worksheet.getListFeedUrl().toString() + "?sq=" + query).toURL();
+			List<ListEntry> rows = spreadsheetService.getFeed(listFeedUrl, ListFeed.class).getEntries();
+			
+			Set<Player> players = new HashSet<>();
+			if (rows != null) {
+				PlayersDao dao = SpreadsheetDaoFactory.getPlayersDaoInstance();
+				for (ListEntry row : rows) {
+					long playerId = Long.parseLong(row.getCustomElements().getValue("player"));
+					players.add(dao.get(playerId));
+				}
+			}
+			
+			return players;
+			
+		} catch (Throwable t) {
+			throw new AthleticsDaoException(t);
+		}
 	}
 
 	@Override
