@@ -46,7 +46,7 @@ public class SpreadsheetTeamsImpl extends AbstractSpreadsheetDao<Team> implement
 
 	@Override
 	public Set<Player> getPlayers(long id) throws AthleticsDaoException {
-		WorksheetEntry worksheet = getWorksheet("PlayersToTeams");
+		WorksheetEntry worksheet = getWorksheet(PLAYERS_TO_TEAMS_WORKSHEET_TITLE);
 		
 		try {
 			String query = URLEncoder.encode("team = " + id, "UTF-8");
@@ -102,6 +102,6 @@ public class SpreadsheetTeamsImpl extends AbstractSpreadsheetDao<Team> implement
 
 	@Override
 	protected String getWorksheetName() {
-		return "Teams";
+		return TEAMS_WORKSHEET_TITLE;
 	}
 }

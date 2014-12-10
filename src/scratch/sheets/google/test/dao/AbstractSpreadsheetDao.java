@@ -21,7 +21,13 @@ import com.google.gdata.data.spreadsheet.WorksheetFeed;
 public abstract class AbstractSpreadsheetDao<T extends AbstractResource> implements AthleticsDao<T> {
 	
 	private static final String SPREADSHEET_FEED_URL = "https://spreadsheets.google.com/feeds/spreadsheets/private/full";
-	private static final String SPREADSHEET_TITLE = "TestData";
+	
+	protected static final String SPREADSHEET_TITLE = "TestData";
+	protected static final String PLAYERS_WORKSHEET_TITLE = "Players";
+	protected static final String COACHES_WORKSHEET_TITLE = "Coaches";
+	protected static final String SPORTS_WORKSHEET_TITLE = "Sports";
+	protected static final String TEAMS_WORKSHEET_TITLE = "Teams";
+	protected static final String PLAYERS_TO_TEAMS_WORKSHEET_TITLE = "PlayersToTeams";
 	
 	protected SpreadsheetService spreadsheetService;
 	
